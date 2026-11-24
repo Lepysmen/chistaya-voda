@@ -370,6 +370,9 @@ body.mob .fcard img{height:36px}
 /* ---------- points popup ---------- */
 .ptsf{position:absolute;left:50%;top:45%;z-index:7;transform:translate(-50%,-50%);pointer-events:none;white-space:nowrap;font:800 clamp(30px,3vw + 3vh,64px)/1.1 Nunito,system-ui,sans-serif;color:#4a3000;padding:.12em .55em;border-radius:999px;background:linear-gradient(#fff1a8,#f6c33a);border:4px solid #b8860b;box-shadow:0 6px 0 #9a6f08,0 12px 28px rgba(0,0,0,.3);animation:ptsf 2s ease-out forwards}
 @keyframes ptsf{0%{opacity:0;transform:translate(-50%,-30%) scale(.5)}14%{opacity:1;transform:translate(-50%,-50%) scale(1.12)}24%{transform:translate(-50%,-50%) scale(1)}78%{opacity:1;transform:translate(-50%,-55%) scale(1)}100%{opacity:0;transform:translate(-50%,-85%) scale(.95)}}
+
+.rc-gc{margin-top:6px;font-weight:700;font-size:clamp(13px,.45vw + .7vh,16px);color:#0d4f73}
+.rc-gc b{font-variant-numeric:tabular-nums}
 </style>
 </head>
 <body>
@@ -682,17 +685,23 @@ rc.style.maxHeight='none';rc.style.scale='';var nat=rc.offsetHeight,avail=one?H-
 if(!one&&nat>avail){var h2=Math.max(H*.2,H-16-nat);if(h2<hh){hh=h2;put(E.k,W*.13);put(E.f,W*.5);put(E.g,W*.87);avail=H-hh*1.08-18}}
 var sc=Math.min(1,avail/nat);if(sc<1){sc=Math.max(sc,.45);rc.style.transformOrigin='50% 0';rc.style.scale=String(sc);if(nat*sc>avail+1)rc.style.maxHeight=(avail/sc)+'px'}
 return true}
-function end(){if(!S.fin){S.fin={ph:0};[300,2800,5300].forEach(function(ms){setTimeout(function(){if(S.fin&&S.fin.ph==0&&S.i>=L.length)sfx('pop')},ms)});S.fin.tm=setTimeout(function(){if(S.i>=L.length&&S.fin&&S.fin.ph==0){S.fin.ph=1;draw()}},14000)}
+function end(){if(!S.fin){S.fin={ph:0};gcHit();[300,2800,5300].forEach(function(ms){setTimeout(function(){if(S.fin&&S.fin.ph==0&&S.i>=L.length)sfx('pop')},ms)});S.fin.tm=setTimeout(function(){if(S.i>=L.length&&S.fin&&S.fin.ph==0){S.fin.ph=1;draw()}},14000)}
 var ph=S.fin.ph,bs=ph?{}:{k:bub('k','Поздравляю! Ты прошёл все 10 испытаний и научился различать мусор, микробы, взвесь, масла, соли, ионы металлов и растворённую химию.'),f:bub('f','Запомни: метод выбирают по свойству загрязнителя. Сначала наблюдай, затем выбирай технологию, а после очистки проверяй результат.'),g:bub('g','Не-е-ет! Ты победил меня логикой! Но я ещё встречусь там, где бросают мусор, льют масло в раковину и не экономят воду.')};
 var pn=ph?'<div class="rs"><span class="sm2">Чистая вода начинается с действий: не бросай мусор в водоёмы, не выливай масло и химикаты в раковину, экономь воду. Игра обучает принципам и не заменяет санитарные инструкции.</span><span class="bt2"><button class="btn s" data-a="jr">Журнал знаний</button><button class="btn" data-a="go">Начать сначала</button></span></div>'
 :'<button class="btn big fgo" data-a="fres">Узнать результат ▸</button>';
 lay('<span>Финал: река снова чистая!</span>',100,'<i class="vm fin"></i>',bs,'h','a',pn);
-if(ph){var st=app.querySelector('.stg');(mob()&&app.querySelector('.mbubs')||st).insertAdjacentHTML('beforeend',rcard());fitFin();runCount();lbInit();renderLB()}
+if(ph){var st=app.querySelector('.stg');(mob()&&app.querySelector('.mbubs')||st).insertAdjacentHTML('beforeend',rcard());if(GC.v==null&&!GC.busy)gcReq('get',1);fitFin();runCount();lbInit();renderLB()}
 if(S.jo)app.insertAdjacentHTML('beforeend','<div class="ov"><div class="card"><h2>Журнал знаний</h2><ul>'+S.j.map(function(x){return '<li>'+x+'</li>'}).join('')+'</ul><button class="btn" data-a="jc">Закрыть</button></div></div>')}
+var GC={v:null,u:'https://abacus.jasoncameron.dev/'};
+function gcTxt(){var n=GC.v;if(n==null)return '';var a=n%10,b=n%100,w=(a>=2&&a<=4&&(b<12||b>14))?'раза':'раз';return n.toLocaleString('ru-RU')+' '+w}
+function gcShow(){app.querySelectorAll('.rc-gc').forEach(function(e){e.hidden=GC.v==null;var b=e.querySelector('.gc');if(b)b.textContent=gcTxt()})}
+function gcReq(k,n){if(!window.fetch)return;GC.busy=1;var c=window.AbortController?new AbortController():null,tm=setTimeout(function(){if(c)c.abort()},20000);
+ fetch(GC.u+k+'/chistaya-voda-game/finished',{cache:'no-store',signal:c?c.signal:undefined}).then(function(r){return r.ok?r.json():null}).then(function(d){clearTimeout(tm);if(d&&typeof d.value=='number'){GC.busy=0;GC.v=d.value;gcShow()}else throw 0}).catch(function(){clearTimeout(tm);if(n>0)setTimeout(function(){gcReq(k,n-1)},2500);else{GC.busy=0;if(k=='hit')gcReq('get',1)}})}
+function gcHit(){gcReq('hit',2)}
 function rcard(){var pl=S.pl||[],chips='',perfect=0;for(var k=0;k<10;k++){var v=pl[k]||0,mx=k==9?200:100;if(v==mx)perfect++;chips+='<i class="lv'+(v==mx?' pf':'')+'" data-k="'+k+'"><small>Ур. '+(k+1)+'</small><b>'+v+'</b></i>'}
 var sv=S.fin.saved;
 return '<div class="rcard" role="region" aria-label="Итоги игры"><div class="rc-a"><div class="rc-t">Твой результат</div><div class="rc-n"><b class="cnt">0</b><span>из 1100 очков</span></div>'
-+'<div class="rc-lv">'+chips+'</div><div class="rc-st">Без ошибок: <b>'+perfect+'</b> из 10 уровней</div><div class="rc-bd">🏅 Титул: Эко-инженер</div>'
++'<div class="rc-lv">'+chips+'</div><div class="rc-st">Без ошибок: <b>'+perfect+'</b> из 10 уровней</div><div class="rc-gc"'+(GC.v==null?' hidden':'')+'>🌍 Игру прошли до конца уже <b class="gc">'+gcTxt()+'</b></div><div class="rc-bd">🏅 Титул: Эко-инженер</div>'
 +'<form class="rc-f"'+(sv?' hidden':'')+'><label for="rcname">Оставь своё имя в Зале чистой воды — пусть все знают, кто вернул реке радугу!</label><div class="rc-fr"><input id="rcname" maxlength="20" autocomplete="off" placeholder="Твоё имя"><button class="btn" type="submit">Записать</button></div></form>'
 +'<p class="rc-s" aria-live="polite">'+(sv?'Готово! Ты в рейтинге. Сможешь побить свой рекорд?':'')+'</p></div>'
 +'<div class="rc-b"><div class="rc-t">Рейтинг последних 10 игроков</div><ol class="lb"></ol><p class="lb-n"></p></div></div>'}
